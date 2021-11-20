@@ -1,0 +1,19 @@
+---
+- name: Exporter package
+  apt:
+    name: 
+      - prometheus-node-exporter
+      - nginx
+    update_cache: yes
+
+- name: Remove default nginx conf
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Nginx restart
+
+- name: Nginx conf for only exporter
+  template:
+    src: nginx_conf_4node
+    dest: /etc/nginx/sites-enabled/nginx_conf_4node
+  notify: Nginx restart

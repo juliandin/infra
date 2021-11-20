@@ -1,0 +1,11 @@
+mysql> select * from item;
++----+-----------------------------------------------+-------+
+| id | value                                         | state |
++----+-----------------------------------------------+-------+
+|  1 | A pre-created item with no particular meaning |     1 |
+|  2 | Another even less meaningful item             |     0 |
+|  3 | Test                                          |     1 |
+|  4 | Test2                                         |     0 |
++----+-----------------------------------------------+-------+
+4 rows in set (0.00 sec)
+

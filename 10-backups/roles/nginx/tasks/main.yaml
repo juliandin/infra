@@ -1,0 +1,14 @@
+---
+- name: Exporter package
+  apt:
+    name: 
+      - prometheus-node-exporter
+      - nginx
+    update_cache: yes
+
+
+- name: Ensure nginx started
+  service:
+    name: nginx
+    state: started
+    enabled: yes

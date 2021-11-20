@@ -1,0 +1,83 @@
+---
+- name: Backup user
+  user:
+    name: backup
+    password: "$6$eAPoFxG4BHwgQNjw$JY2QJhYHx8z44/w0ENI.kXawiG3.vQ0lcubBMGH/54oulhAvvbK.lfiN5sVVggnUzxNcKoyc6XWgHXT27ezDh0"
+    shell: /bin/bash
+    state: present
+    home: /home/backup
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: /home/backup/.ssh/id_rsa
+
+- name: Creates directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: backup
+    mode: '0700'
+  with_items:
+  - /home/backup/backup
+  - /home/backup/restore
+
+- name: Install duplicity
+  apt: 
+    name: duplicity
+    state: latest
+
+- name: Determine available groups on this host
+  getent:
+    database: group
+
+- name: Add additional groups to backup user
+  user:
+    append: yes
+    name: backup
+    groups: "{{item}}"
+  when: item in ansible_facts.getent_group
+  with_items:
+    - grafana
+    - agama
+    - influxdb
+    - prometheus
+  
+- name: Check if agama database exists on this host
+  shell: mysql -e 'SHOW DATABASES;' | grep agama
+  register: dbstatus
+  failed_when: dbstatus.rc == 2
+  changed_when: false
+
+- name: Create backup user in mysql and give permissions to agama db
+  mysql_user:
+    name: backup
+    password: "{{ mysql_pass_backup }}"
+    priv: "agama.*:ALL"
+    state: present
+    host: "%"
+  when: dbstatus.rc == 0 
+
+- name: Add MySQL conf file for dumps on host with agama db
+  template:
+    src: mysql_dump_flags.j2
+    dest: /home/backup/.my.cnf
+    owner: backup
+    group: backup
+    mode: '0400'
+  when: dbstatus.rc == 0
+
+- name: Add cronjob
+  template:
+    src: cron-backup.j2
+    dest: /etc/cron.d/backup
+    mode: '0600'
+
+
+- name: Changing databases permissions so backup user can copy and backup them.
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+    mode: '0770'
+  with_items:
+    - /var/lib/prometheus/ 
+    - /var/lib/influxdb/

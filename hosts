@@ -1,0 +1,44 @@
+vm-1 ansible_host=193.40.156.86 ansible_ssh_user=ubuntu ansible_port=10622 ansible_python_interpreter=python3
+vm-2 ansible_host=193.40.156.86 ansible_ssh_user=ubuntu ansible_port=8722 ansible_python_interpreter=python3
+vm-3 ansible_host=193.40.156.86 ansible_ssh_user=ubuntu ansible_port=15822 ansible_python_interpreter=python3
+
+[dns_masters]
+vm-3
+
+[dns_slaves]
+vm-1
+vm-2
+
+[dns_servers:children]
+dns_slaves
+dns_masters
+
+[docker_agama]
+vm-1
+vm-2
+
+[docker_grafana]
+vm-3
+
+[prometheus_server]
+vm-3
+
+[influxdb]
+vm-3
+
+[pinger]
+vm-3
+
+[mysql_master]
+vm-1
+
+[mysql_slave]
+vm-2
+
+[mysql_servers:children]
+mysql_master
+mysql_slave
+
+[haproxy]
+vm-1
+vm-2

@@ -1,0 +1,25 @@
+$TTL	604800
+{{ domain }}.	IN	SOA	vm-1.{{ domain }}. julian.{{ domain }}. (
+			      3		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+
+
+{% for vm in groups['dns_servers'] -%}
+{{ domain }}.	IN	NS	{{ vm }}
+{% endfor %}
+
+{% for vm in hostvars -%}
+{{ hostvars[vm]['inventory_hostname'] }}	IN	A	{{ hostvars[vm]['ansible_default_ipv4']['address'] }}
+{{ hostvars[vm]['inventory_hostname'] }}	IN	AAAA	{{ hostvars[vm]['ansible_facts']['ens3']['ipv6'][0]['address'] }} 
+{{ hostvars[vm]['inventory_hostname'] }}    IN	TXT	"Hostname: {{ hostvars[vm]['ansible_facts']['hostname'] }}"
+{% endfor %}
+
+{% for i in dns_cnames -%}
+{{ i['cname'] }}	IN	CNAME	{{ i['real'] }}.{{ domain }}.
+{% endfor %}
+
+backup	IN	A	{{ backup_host }}

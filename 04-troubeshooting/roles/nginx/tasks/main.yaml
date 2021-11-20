@@ -1,0 +1,27 @@
+- name: Installing nginx
+  apt: 
+    name: nginx 
+    state: latest
+
+- name: Copying index file
+  copy:
+    src: /home/jul/ica0002/04-troubeshooting/roles/nginx/files/index.html
+    dest: /var/www/html/index.nginx-debian.html
+    follow: yes
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
+
+- name: Copy conf file
+  copy:
+    src: /home/jul/ica0002/04-troubeshooting/roles/nginx/files/default
+    dest: /etc/nginx/sites-enabled/default
+    mode: '0755'
+  notify: Nginx restart
+
+- name: Ensure that nginx is running and starts on boot
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+

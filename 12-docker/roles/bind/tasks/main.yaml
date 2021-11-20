@@ -1,0 +1,34 @@
+- name: Installing bind9
+  apt: 
+    name: bind9
+    state: latest
+    update_cache: yes
+
+- name: Ensure that bind9 is running and starts on boot
+  service:
+    name: bind9
+    enabled: yes
+    state: started
+
+- name: Bind options config
+  template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+  notify: restart bind
+
+- name: Bind local config
+  template:
+    src: named.conf.local
+    dest: /etc/bind/named.conf.local
+  notify: restart bind
+
+- name: master zone config
+  template:
+    src: db.something.j2
+    dest: /etc/bind/db.something
+  notify: 
+    - restart bind
+
+- name: restart for master zone
+  shell:
+    cmd: rndc reload

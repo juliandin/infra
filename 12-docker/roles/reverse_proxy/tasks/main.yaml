@@ -1,0 +1,18 @@
+---
+- name: Remove default nginx conf
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Nginx restart
+
+- name: Nginx conf for exporters
+  template:
+    src: nginx_conf_4node
+    dest: /etc/nginx/sites-enabled/nginx_conf_4node
+  notify: Nginx restart
+
+- name: Stub status 
+  template:
+    src: stub_status
+    dest: /etc/nginx/sites-enabled/stub_status
+  notify: Nginx restart

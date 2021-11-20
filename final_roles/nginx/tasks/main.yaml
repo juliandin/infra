@@ -1,0 +1,18 @@
+---
+- name: Nginx and node exporter package
+  apt:
+    name: 
+      - prometheus-node-exporter
+      - nginx
+
+- name: Ensure nginx started
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Ensure node exporter started
+  service:
+    name: prometheus-node-exporter
+    state: started
+    enabled: yes

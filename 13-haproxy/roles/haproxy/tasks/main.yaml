@@ -1,0 +1,31 @@
+---
+- name: HAProxy Package
+  apt:
+    name: haproxy
+
+- name: HAProxy cfg
+  template:
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - Restart HAProxy
+
+- name: Docker package
+  apt:
+    name:
+    - python3-docker
+    - docker.io
+
+- name: Servicizing Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: HAProxy exporter 
+  docker_container: 
+    name: haproxy_exporter 
+    image: quay.io/prometheus/haproxy-exporter:v0.9.0 
+    ports: 
+      - 9101:9101 
+    command: --haproxy.scrape-uri="http://172.17.0.1:88/haproxy?stats;csv"

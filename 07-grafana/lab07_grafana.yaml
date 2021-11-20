@@ -1,0 +1,82 @@
+---
+- name: Collect info about all VMs
+  hosts: all
+  become: yes
+  roles:
+    - init
+
+- name: DNS server
+  hosts: dns_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - bind9
+    - bind_exporter
+  tags:
+    - bind
+    - bind9
+
+- name: adding dns server to hosts (resolv.conf - resolvers etc. etc.)
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - hosts_dns
+  tags:
+    - resolver
+
+- name: Agama app
+  hosts: web_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - agama
+    - uwsgi
+    - nginx_exporter
+  tags:
+    - nginx
+    - agama
+
+- name: Database server
+  hosts: mysql_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - mysql
+    - mysql_exporter
+  tags:
+    - mysql
+
+- name: Prometheus
+  hosts: prometheus_server
+  become: yes
+  gather_facts: no
+  roles:
+    - prometheus
+  tags:
+    - prometheus
+
+- name: Grafana
+  hosts: grafana
+  become: yes
+  gather_facts: no
+  roles:
+    - grafana
+  tags:
+    - grafana
+
+- name: Node exporter
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - node_exporter
+
+- name: Reverse proxy
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - reverse_proxy
+  tags:
+    - proxy

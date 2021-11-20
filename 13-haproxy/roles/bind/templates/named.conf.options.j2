@@ -1,0 +1,17 @@
+options {
+	directory "/var/cache/bind";
+
+	forwarders {
+        {%-for i in dns_forwarders %}
+            {{ i }};
+        {%- endfor %}
+	};
+	allow-query { 
+        {%- for j in allowed_queries %}
+            {{ j }};
+        {%- endfor %}
+    };
+
+	dnssec-validation no;
+	auth-nxdomain no; 
+};

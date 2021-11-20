@@ -1,0 +1,13 @@
+- name: restart bind
+  service:
+    name: bind9
+    state: restarted
+
+- name: systemd-resolved stopped
+  service:
+    name: systemd-resolved
+    state: stopped
+
+- name: rndc reload
+  shell:
+    cmd: rndc reload

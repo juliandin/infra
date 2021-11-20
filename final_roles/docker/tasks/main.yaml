@@ -1,0 +1,13 @@
+---
+- name: Docker
+  apt:
+    name:
+    - python3-docker
+    - docker.io
+    - python-pymysql
+
+- name: Service Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes

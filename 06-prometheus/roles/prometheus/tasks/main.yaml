@@ -1,0 +1,16 @@
+---
+- name: Install prometheus
+  apt:
+    name: prometheus
+
+- name: prometheus arguments
+  template:
+    src: prometheus
+    dest: /etc/default/prometheus
+  notify: Prometheus restart
+
+- name: prometheus conf file (target machines)
+  template:
+    src: prometheus.yaml.j2
+    dest: /etc/prometheus/prometheus.yml
+  notify: Prometheus restart

@@ -1,0 +1,59 @@
+------------ VM-1 ------------
+
+ubuntu@juliandin-1:/etc/bind$ ping vm-1.keker.jd
+PING vm-1.keker.jd (192.168.42.71) 56(84) bytes of data.
+64 bytes from 192.168.42.71 (192.168.42.71): icmp_seq=1 ttl=64 time=0.008 ms
+64 bytes from 192.168.42.71 (192.168.42.71): icmp_seq=2 ttl=64 time=0.026 ms
+^C
+--- vm-1.keker.jd ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1031ms
+rtt min/avg/max/mdev = 0.008/0.017/0.026/0.009 ms
+
+
+
+
+ubuntu@juliandin-1:/etc/bind$ ping vm-2.keker.jd
+PING vm-2.keker.jd (192.168.42.69) 56(84) bytes of data.
+64 bytes from 192.168.42.69 (192.168.42.69): icmp_seq=1 ttl=64 time=0.903 ms
+64 bytes from 192.168.42.69 (192.168.42.69): icmp_seq=2 ttl=64 time=0.322 ms
+^C
+--- vm-2.keker.jd ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 0.322/0.612/0.903/0.291 ms
+
+------------ VM-2 ------------
+
+
+ubuntu@juliandin-2:~$ ping vm-1.keker.jd
+PING vm-1.keker.jd (192.168.42.71) 56(84) bytes of data.
+64 bytes from 192.168.42.71 (192.168.42.71): icmp_seq=1 ttl=64 time=0.212 ms
+64 bytes from 192.168.42.71 (192.168.42.71): icmp_seq=2 ttl=64 time=0.311 ms
+^C
+--- vm-1.keker.jd ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1029ms
+rtt min/avg/max/mdev = 0.212/0.261/0.311/0.052 ms
+
+
+
+
+ubuntu@juliandin-2:~$ dig A vm-1.keker.jd +short
+192.168.42.71
+ubuntu@juliandin-2:~$ dig NS keker.jd +short
+vm-1.keker.jd.
+
+
+
+------------ Small updates ------------
+
+ubuntu@juliandin-1:/etc/bind$ dig TXT vm-2.keker.jd. +short
+"Hostname: juliandin-2"
+
+ubuntu@juliandin-1:/etc/bind$ dig AAAA vm-1.keker.jd. +short
+fe80::f816:3eff:fe20:d8b
+ubuntu@juliandin-1:/etc/bind$ ip -6 addr | grep inet6 |  grep -v ::1/128
+    inet6 fe80::f816:3eff:fe20:d8b/64 scope link 
+
+
+
+
+

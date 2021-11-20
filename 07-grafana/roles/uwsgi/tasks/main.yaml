@@ -1,0 +1,23 @@
+- name: Install uwsgi
+  apt:
+    name: uwsgi
+
+- name: Install python uwsgi plugin
+  apt:
+    name: uwsgi-plugin-python3
+
+- name: Ensure that uwsgi runs and it starts on sysem boot
+  service: 
+    name: uwsgi
+    enabled: yes
+    state: started
+
+- name: Get uwsgi config file
+  template:
+    src: /home/jul/ica0002/04-troubeshooting/roles/uwsgi/templates/agama.ini
+    dest: /etc/uwsgi/apps-enabled/agama.ini
+    owner: agama
+    mode: '0755'
+  notify: Restart uwsgi
+
+     

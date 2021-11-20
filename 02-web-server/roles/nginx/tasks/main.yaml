@@ -1,0 +1,17 @@
+- name: Installing nginx
+  apt: 
+    name: nginx 
+    state: latest
+- name: starting nginx
+  service:
+    name: nginx
+    state: started
+
+- name: Copying index file
+  copy:
+    src: /home/jul/infra-labs/02-web-server/roles/nginx/files/index.html
+    dest: /var/www/html/index.nginx-debian.html
+    follow: yes
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'

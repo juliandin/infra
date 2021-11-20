@@ -1,0 +1,114 @@
+---
+- name: Collect info about all VMs
+  hosts: all
+  become: yes
+  roles:
+    - init
+    - users
+
+- name: Nginx and node exporters 
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - nginx
+  tags:
+    - nginx
+    - node_exporters
+
+- name: DNS server
+  hosts: dns_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - bind
+    - bind_exporter
+  tags:
+    - bind
+
+- name: adding dns server to hosts (resolv.conf - resolvers etc. etc.)
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - hosts_dns
+  tags:
+    - resolver
+
+- name: Agama app
+  hosts: web_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - agama
+    - uwsgi
+    - nginx_exporter
+  tags:
+    - nginx
+    - agama
+
+- name: Prometheus
+  hosts: prometheus_server
+  become: yes
+  gather_facts: no
+  roles:
+    - prometheus
+  tags:
+    - prometheus
+
+- name: Database server
+  hosts: mysql_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - mysql
+    - mysql_exporter
+  tags:
+    - mysql
+
+- name: Grafana
+  hosts: grafana
+  become: yes
+  gather_facts: no
+  roles:
+    - grafana
+  tags:
+    - grafana
+
+- name: General monitoring
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - rsyslog
+  tags:
+    - rsyslog
+    - rsys
+
+- name: Reverse proxy
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - reverse_proxy
+  tags:
+    - proxy
+
+- name: Influx database
+  hosts: influxdb
+  become: yes
+  gather_facts: no
+  roles:
+    - influxdb
+  tags:
+    - influx
+    - influxdb
+
+- name: Pinger service
+  hosts: pinger
+  become: yes
+  gather_facts: no
+  roles:
+    - pinger
+  tags:
+    - pinger

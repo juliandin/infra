@@ -1,0 +1,16 @@
+---
+  - name: Database server
+    hosts: db_servers
+    become: yes
+    roles:
+      - mysql
+
+  - name: Web app
+    hosts: app_servers
+    become: yes
+    roles:
+#      - users
+      - nginx
+      - agama
+      - uwsgi
+

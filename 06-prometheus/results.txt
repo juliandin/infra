@@ -1,0 +1,11 @@
+Targets
+node (2/2 up) 
+Endpoint	State	Labels	Last Scrape	Error
+http://vm-1.julprom.jd:9100/metrics UP	instance="vm-1.julprom.jd:9100"	882ms ago	
+http://vm-2.julprom.jd:9100/metrics UP	instance="vm-2.julprom.jd:9100"	4.647s ago	
+
+
+
+
+#useful run for errors search
+prometheus --config.file /etc/prometheus/prometheus.yml

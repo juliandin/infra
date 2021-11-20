@@ -1,0 +1,29 @@
+- name: Installing mysql
+  apt: 
+    name: mysql-server
+    state: latest
+
+- name: installing mysql-python module
+  apt:
+    name: 
+      - python3-pymysql
+      - python3-mysqldb
+    state: present
+
+- name: Adding new cnfg file for mysql
+  copy:
+    src: override.cnf
+    dest: /etc/mysql/mysql.conf.d/override.cnf
+  notify: Mysql restart
+
+- name: Create MySQL database
+  mysql_db:
+    name: "{{ mysql_database }}"
+
+- name: Create database user
+  mysql_user:
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password }}"
+    priv: "{{ mysql_database }}.*:ALL"
+    state: present
+    host: "%"

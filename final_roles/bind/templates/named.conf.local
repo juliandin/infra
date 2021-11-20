@@ -1,0 +1,27 @@
+zone "{{ domain }}" {
+    {% if inventory_hostname in groups['dns_masters'] -%}
+    type master;
+    also-notify { 
+        {% for vm in groups['dns_slaves'] -%}
+            {{ hostvars[vm]['ansible_default_ipv4']['address'] }};
+        {% endfor -%} 
+        };
+    file "/var/lib/bind/db.{{ domain }}";
+    allow-transfer { key dns-transfer; };
+    allow-update { key dns-update; };
+{% endif %}
+    {%- if inventory_hostname in groups['dns_slaves'] -%}
+    type slave;
+    file "/var/lib/bind/db.{{ domain }}";
+    masters {
+        {% for vm in groups['dns_masters'] -%}
+            {{ hostvars[vm]['ansible_default_ipv4']['address'] }};
+        {% endfor -%}
+    };
+};
+{% for vm in groups['dns_masters'] %}
+server {{ hostvars[vm]['ansible_default_ipv4']['address'] }} {
+    keys { dns-transfer; };
+{% endfor %}
+{% endif %}
+};

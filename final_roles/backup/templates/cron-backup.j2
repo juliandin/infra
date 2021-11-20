@@ -1,0 +1,15 @@
+{% if inventory_hostname in groups['mysql_master'] -%}
+20 0 * * *  backup  mysqldump agama > /home/backup/backup/agama.sql
+30 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/agama.sql rsync://juliandin@backup.{{ domain }}//home/juliandin
+30 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/agama.sql rsync://juliandin@backup.{{ domain }}//home/juliandin
+{% endif %}
+{% if inventory_hostname in groups['prometheus_server'] -%}
+40 0 * * *  backup  cp -a /var/lib/prometheus /home/backup/backup/
+50 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/prometheus rsync://juliandin@backup.{{ domain }}//home/juliandin/prometheus
+50 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/prometheus rsync://juliandin@backup.{{ domain }}//home/juliandin/prometheus
+{% endif %}
+{% if inventory_hostname in groups['influxdb'] -%}
+35 0 * * *  backup  cp -a /var/lib/influxdb /home/backup/backup/
+45 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/influxdb rsync://juliandin@backup.{{ domain }}//home/juliandin/influxdb
+45 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/influxdb rsync://juliandin@backup.{{ domain }}//home/juliandin/influxdb
+{% endif %}

@@ -1,0 +1,21 @@
+{% if inventory_hostname in groups['mysql_servers'] -%}
+20 0 * * *  backup  mysqldump agama > /home/backup/backup/agama.sql
+30 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/agama.sql rsync://juliandin@backup.julprom.jd//home/juliandin
+30 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/agama.sql rsync://juliandin@backup.julprom.jd//home/juliandin
+
+35 0 * * *  backup  cp -a /var/lib/influxdb /home/backup/backup/
+40 0 * * *  backup  cp -a /var/lib/prometheus /home/backup/backup/
+
+45 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/influxdb rsync://juliandin@backup.julprom.jd//home/juliandin/influxdb
+45 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/influxdb rsync://juliandin@backup.julprom.jd//home/juliandin/influxdb
+
+50 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/prometheus rsync://juliandin@backup.julprom.jd//home/juliandin/prometheus
+50 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/prometheus rsync://juliandin@backup.julprom.jd//home/juliandin/prometheus
+{% endif %}
+{% if inventory_hostname in groups['web_servers'] -%}
+0 0 1 * *  backup  cp /opt/agama/agama.py /home/backup/backup/agama.py
+5 0 1 * *  backup  rsync -bv agama.py juliandin@backup.julprom.jd:
+10 0 * * *  backup  cp /var/lib/grafana/grafana.db /home/backup/backup/grafana.db
+15 0 * * 7  backup  duplicity --no-encryption full /home/backup/backup/grafana.db rsync://juliandin@backup.julprom.jd//home/juliandin/grafana_db
+15 0 * * 1-6  backup  duplicity --no-encryption incremental /home/backup/backup/grafana.db rsync://juliandin@backup.julprom.jd//home/juliandin/grafana_db
+{% endif %}

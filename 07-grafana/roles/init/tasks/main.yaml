@@ -1,0 +1,4 @@
+- setup:
+
+- apt:
+    update_cache: yes

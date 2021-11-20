@@ -1,0 +1,4 @@
+- name: systemd-resolved stopped
+  service:
+    name: systemd-resolved
+    state: stopped

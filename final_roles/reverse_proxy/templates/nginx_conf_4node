@@ -1,0 +1,52 @@
+server {
+	listen 80 default_server;
+	root /var/www/html;
+
+	location /metrics {
+		proxy_pass http://localhost:9100/metrics;
+	}
+
+	location /nginx-metrics {
+		proxy_pass http://localhost:9113/metrics;
+	}
+
+	{% if inventory_hostname in groups['mysql_servers'] -%}
+	location /mysql-metrics {
+		proxy_pass http://localhost:9104/metrics;
+	}
+	{% endif %}
+
+	{% if inventory_hostname in groups['dns_servers'] -%}
+	location /bind-metrics {
+		proxy_pass http://localhost:9119/metrics;
+	}
+	{% endif %}
+
+	{% if inventory_hostname in groups['docker_agama'] -%}
+	location / {
+		proxy_pass http://localhost:{{ agama_docker_port }};
+	}
+	{% endif %}
+
+	{% if inventory_hostname in groups['prometheus_server'] -%}
+	location /prometheus {
+		proxy_pass http://localhost:9090;
+	}
+	{% endif -%}
+
+	{% if inventory_hostname in groups['docker_grafana'] -%}
+	location /grafana {
+		proxy_pass http://localhost:{{ grafana_docker_port }};
+	}
+	{% endif -%}
+
+	{% if inventory_hostname in groups['haproxy'] -%}
+	location /haproxy-metrics {
+		proxy_pass http://localhost:9101/metrics;
+	}
+
+	location /keepalived-metrics {
+		proxy_pass http://localhost:9165/metrics;
+	}
+	{% endif %}
+}

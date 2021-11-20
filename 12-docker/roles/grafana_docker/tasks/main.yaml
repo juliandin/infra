@@ -1,0 +1,30 @@
+---
+- name: Creating dir for docker
+  file:
+    path: /opt/docker
+    owner: root
+    group: root
+    mode: '0755'
+    state: directory
+
+- name: Creating dir for grafana container
+  file:
+    path: /opt/docker/grafana
+    owner: "472"
+    group: "472"
+    mode: '0755'
+    state: directory
+
+- name: Grafana container
+  docker_container:
+    name: grafana
+    image: grafana/grafana
+    volumes:
+      - /opt/docker/grafana:/var/lib/grafana
+    published_ports:
+      - "{{ grafana_docker_port }}:3000"
+    env:
+      GF_SERVER_ROOT_URL: "http://localhost:{{ grafana_docker_port }}/grafana"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    state: started
+    

@@ -1,0 +1,29 @@
+key "dns-transfer" {
+	algorithm hmac-sha256;
+	secret "{{ ns_transfer_key }}";
+};
+
+key "dns-update" {
+	algorithm hmac-sha256;
+	secret "{{ ns_update_key }}";
+};
+
+options {
+	directory "/var/cache/bind";
+	forwarders {
+        {%-for i in dns_forwarders %}
+            {{ i }};
+        {%- endfor %}
+	};
+	allow-query { 
+        {%- for j in allowed_queries %}
+            {{ j }};
+        {%- endfor %}
+    };
+	dnssec-validation no;
+	auth-nxdomain no; 
+};
+
+statistics-channels {
+    inet 127.0.0.1 port 8053 allow { 127.0.0.1; };
+};

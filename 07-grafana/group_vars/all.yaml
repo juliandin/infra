@@ -1,0 +1,71 @@
+domain: julprom.jd
+
+dns_forwarders:
+  - 0.0.0.0
+  - 1.1.1.1
+  - 8.8.8.8
+  - 9.9.9.9
+
+dns_cnames:
+  - cname: prometheus
+    real: "{{ groups['prometheus_server'] [0] }}"
+  - cname: db
+    real: "{{ groups['mysql_servers'] [0] }}"
+  - cname: grafana
+    real: "{{ groups['grafana'] [0] }}"
+  - cname: www
+    real: "{{ groups['web_servers'] [0] }}"
+  - cname: ns
+    real: "{{ groups['dns_servers'] [0] }}"
+
+allowed_queries:
+  - 192.168.42.0/24
+  - 127.0.0.0/8
+
+prometheus_jobs:
+  - name: node
+    targets: "{{ groups['all'] }}"
+    port: 9100
+
+  - name: bind
+    targets: 
+      - ns
+    port: 9119
+
+  - name: mysql
+    targets: 
+      - db
+    port: 9104
+    
+  - name: agama-nginx
+    targets: 
+      - www
+    port: 9113
+
+  - name: grafana
+    targets: 
+      - grafana
+    port: 3000
+    
+my_vm_names:
+  - vm-1
+  - vm-2
+
+mysql_host: 192.168.42.69
+mysql_database: agama
+mysql_user: agama
+mysql_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62343937313630623865393831333532383861656630646238636132663165336466353935666165
+          3631323637313561336661616339333931656661653235630a333639333530616237393934373566
+          34383536373631616365633665636165616439346430363639623635356436373464306633323261
+          3435393234326232310a363731616236313161663937303461396234376461626130613234376466
+          6662
+
+mysql_exporter_pass: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61333163626231376166366132336536306230616566376336316435373263623661313461643234
+          6134623962616131303562386630376138373264343930310a343264323065623230643962396634
+          37383338343862393039323263333533666566356537333532373762353466613937356665306133
+          3330656661313962620a306237623333343865633339323762333131343864353661663562323263
+          6463

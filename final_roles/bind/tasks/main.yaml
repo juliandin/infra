@@ -1,0 +1,59 @@
+- name: Installing bind9
+  apt: 
+    name: 
+      - bind9
+      - python3-dnspython
+
+- name: Bind servisized
+  service:
+    name: bind9
+    enabled: yes
+    state: started
+
+- name: Bind options config
+  template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+  notify: restart bind
+
+- name: Bind local config
+  template:
+    src: named.conf.local
+    dest: /etc/bind/named.conf.local
+  notify: restart bind
+
+- name: Master zone config
+  template:
+    src: db.something.j2
+    dest: /var/lib/bind/db.{{ domain }}
+  notify: 
+    - rndc reload
+  when: inventory_hostname in groups['dns_masters']
+
+- meta: flush_handlers
+
+- name: Add DNS records
+  nsupdate:
+    key_name: "dns-update"
+    key_secret: "{{ ns_update_key }}"
+    key_algorithm: "hmac-sha256"
+    server: "{{ hostvars[groups['dns_masters'][0]]['ansible_default_ipv4']['address'] }}"
+    zone: "{{ domain }}"
+    record: "{{ item.rec }}"
+    value: "{{ item.val }}"
+  loop:
+    - { rec: 'prometheus', val: "{{ hostvars[groups['prometheus_server'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'grafana', val: "{{ hostvars[groups['docker_grafana'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'influxdb', val: "{{ hostvars[groups['influxdb'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'pinger', val: "{{ hostvars[groups['pinger'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'agama1', val: "{{ hostvars[groups['docker_agama'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'agama2', val: "{{ hostvars[groups['docker_agama'][1]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'db', val: "{{ hostvars[groups['mysql_master'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'db-repl', val: "{{ hostvars[groups['mysql_slave'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'ns', val: "{{ hostvars[groups['dns_masters'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'bind-slave1', val: "{{ hostvars[groups['dns_slaves'][0]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'bind-slave2', val: "{{ hostvars[groups['dns_slaves'][1]]['ansible_default_ipv4']['address'] }}" }
+    - { rec: 'backup', val: "{{ backup_host }}" }
+  when: inventory_hostname == groups['dns_masters'][0]
+  notify:
+    - rndc reload

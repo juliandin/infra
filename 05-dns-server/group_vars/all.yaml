@@ -1,0 +1,15 @@
+domain: julprom.jd
+
+dns_forwarders:
+  - 0.0.0.0
+  - 1.1.1.1
+  - 8.8.8.8
+  - 9.9.9.9
+
+allowed_queries:
+  - 192.168.42.0/24
+  - 127.0.0.0/8
+
+my_vm_names:
+  - vm-1
+  - vm-2

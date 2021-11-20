@@ -1,0 +1,67 @@
+---
+- name: Collect info about all VMs
+  hosts: all
+  become: yes
+  roles:
+    - init
+    - users
+
+- name: DNS server
+  hosts: dns_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - bind
+    - bind_exporter
+  tags:
+    - bind
+
+- name: adding dns server to hosts (resolv.conf - resolvers etc. etc.)
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - hosts_dns
+  tags:
+    - resolver
+
+- name: General monitoring
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - rsyslog
+  tags:
+    - rsyslog
+    - rsys
+
+- name: Reverse proxy
+  hosts: all
+  become: yes
+  gather_facts: no
+  roles:
+    - reverse_proxy
+    - nginx_exporter
+  tags:
+    - proxy
+
+- name: Influx database
+  hosts: influxdb
+  become: yes
+  gather_facts: no
+  roles:
+    - influxdb
+  tags:
+    - influx
+    - influxdb
+
+- name: Docker
+  hosts: docker_servers
+  become: yes
+  gather_facts: no
+  roles:
+    - docker
+    - grafana_docker
+    - agama_docker
+  tags:
+    - docker

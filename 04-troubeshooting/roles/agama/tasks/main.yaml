@@ -1,0 +1,28 @@
+- name: Add user agama
+  user:
+    name: agama
+    shell: /bin/bash
+
+- name: Create /opt/agama dir
+  file:
+    path: /opt/agama
+    state: directory
+    owner: agama
+    mode: '0755'
+
+- name: Install agama dependencies
+  apt:
+    name: python3-flask-sqlalchemy
+    state: latest
+
+- name: Isntall mysqlpython3 module for agama 
+  apt:
+    name: python3-pymysql
+    state: latest
+
+- name: Get agama python file
+  get_url:
+    url: https://raw.githubusercontent.com/hudolejev/agama/master/agama.py
+    dest: /opt/agama
+    owner: agama
+    mode: '0755'

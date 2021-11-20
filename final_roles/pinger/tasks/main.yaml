@@ -1,0 +1,59 @@
+---
+- name: install fping
+  apt:
+    name: 
+    - fping
+    - python3-pip
+
+- name: Install influxdb pip
+  pip:
+    name: influxdb
+
+- name: Group for pinger user
+  group:
+    name: pinger
+    state: present
+
+- name: Pinger user
+  user:
+    name: pinger
+    comment: pinger service
+    group: pinger
+
+- name: Script
+  template:
+    src: pinger.sh
+    dest: /usr/local/bin/pinger
+    owner: pinger
+    group: pinger
+    mode: '0755'
+
+- name: Create directory for pinger conf
+  file: path=/etc/pinger state=directory mode=0755
+
+#- name: Create latency database
+#  influxdb_database:
+#      hostname: "{{ hostvars[groups['influxdb'][0]]['ansible_default_ipv4']['address'] }}"
+#      database_name: "latency"
+
+- name: Script config file
+  template:
+    src: pinger.conf
+    dest: /etc/pinger/pinger.conf
+  notify:
+    - Systemctl daemon-reload
+    - Restart pinger
+
+- name: Servisizing
+  template:
+    src: pinger.service
+    dest: /etc/systemd/system/pinger.service
+  notify:
+    - Systemctl daemon-reload
+    - Restart pinger
+
+- name: Start on boot
+  service:
+    name: pinger
+    state: started
+    enabled: yes
